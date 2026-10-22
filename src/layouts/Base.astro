@@ -1,0 +1,194 @@
+---
+import '../styles/global.css';
+import { profile, services, faq, articles, seo, industries } from '../data/profile';
+import { techNames, allKeywords } from '../lib/keywords';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const { title = seo.title, description = seo.description } = Astro.props;
+
+const site = Astro.site!.toString();
+const canonical = new URL(Astro.url.pathname, Astro.site);
+const ogImage = new URL('/og.png', Astro.site);
+const updated = new Date().toISOString();
+const skills = [...new Set([...services.flatMap((s) => s.tags), ...techNames()])];
+const keywords = allKeywords();
+
+// One JSON-LD graph: who you are, what you sell, what you wrote, and the FAQ.
+// Search engines and AI assistants read this to answer "who is / who can do X" queries.
+const schema = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'ProfilePage',
+      '@id': `${canonical}#profilepage`,
+      url: canonical.toString(),
+      name: title,
+      description,
+      inLanguage: 'en',
+      dateModified: updated,
+      keywords: keywords.join(', '),
+      isPartOf: { '@id': `${site}#website` },
+      mainEntity: { '@id': `${site}#person` },
+      primaryImageOfPage: ogImage.toString(),
+    },
+    {
+      '@type': 'Person',
+      '@id': `${site}#person`,
+      name: profile.name,
+      givenName: seo.givenName,
+      familyName: seo.familyName,
+      ...(profile.alternateName && { alternateName: profile.alternateName }),
+      jobTitle: profile.role,
+      description: profile.subheadline,
+      email: `mailto:${profile.email}`,
+      url: site,
+      image: ogImage.toString(),
+      sameAs: profile.socials.map((s) => s.url),
+      knowsAbout: skills,
+      knowsLanguage: seo.languages,
+      hasOccupation: {
+        '@type': 'Occupation',
+        name: 'Software Architect',
+        occupationLocation: { '@type': 'Place', name: 'Remote' },
+        skills: skills.join(', '),
+      },
+      hasCredential: seo.credentials.map((c) => ({
+        '@type': 'EducationalOccupationalCredential',
+        credentialCategory: 'certification',
+        name: c,
+      })),
+    },
+    {
+      '@type': 'ProfessionalService',
+      '@id': `${site}#service`,
+      name: `${profile.name} — ${profile.role}`,
+      description: profile.headline,
+      url: site,
+      email: profile.email,
+      image: ogImage.toString(),
+      founder: { '@id': `${site}#person` },
+      provider: { '@id': `${site}#person` },
+      areaServed: 'Worldwide',
+      knowsAbout: industries,
+      hasOfferCatalog: {
+        '@type': 'OfferCatalog',
+        name: 'Services',
+        itemListElement: services.map((s) => ({
+          '@type': 'Offer',
+          itemOffered: { '@type': 'Service', name: s.title, description: s.body, serviceType: s.tags.join(', ') },
+        })),
+      },
+    },
+    {
+      '@type': 'WebSite',
+      '@id': `${site}#website`,
+      url: site,
+      name: profile.name,
+      inLanguage: 'en',
+      publisher: { '@id': `${site}#person` },
+    },
+    ...articles.map((a) => ({
+      '@type': 'Article',
+      headline: a.title,
+      alternativeHeadline: a.titleEn,
+      description: a.summary,
+      url: a.url,
+      mainEntityOfPage: a.url,
+      inLanguage: a.lang,
+      keywords: a.tags.join(', '),
+      publisher: { '@type': 'Organization', name: a.platform },
+      author: { '@id': `${site}#person` },
+    })),
+    {
+      '@type': 'FAQPage',
+      mainEntity: faq.map((f) => ({
+        '@type': 'Question',
+        name: f.q,
+        acceptedAnswer: { '@type': 'Answer', text: f.a },
+      })),
+    },
+  ],
+};
+---
+
+<!doctype html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta name="keywords" content={keywords.join(', ')} />
+    <meta name="author" content={profile.name} />
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+    <meta name="googlebot" content="index, follow" />
+    <meta name="format-detection" content="telephone=no" />
+    <link rel="canonical" href={canonical} />
+    <link rel="alternate" hreflang="en" href={canonical} />
+    <link rel="alternate" hreflang="x-default" href={canonical} />
+    <link rel="sitemap" type="application/xml" href="/sitemap-index.xml" />
+
+    <!-- Plain-text and Markdown versions for AI assistants -->
+    <link rel="alternate" type="text/plain" title="LLM-friendly profile (summary)" href="/llms.txt" />
+    <link rel="alternate" type="text/plain" title="LLM-friendly profile (full)" href="/llms-full.txt" />
+    <link rel="alternate" type="text/markdown" title="Profile in Markdown" href="/index.md" />
+
+    <!-- Identity links: lets LinkedIn, GitHub, Mastodon etc. verify this site belongs to the same person -->
+    {profile.socials.map((s) => <link rel="me" href={s.url} />)}
+    <link rel="me" href={`mailto:${profile.email}`} />
+
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+
+    <meta property="og:type" content="profile" />
+    <meta property="og:site_name" content={profile.name} />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={`${profile.name}, ${profile.role}`} />
+    <meta property="og:updated_time" content={updated} />
+    <meta property="profile:first_name" content={seo.givenName} />
+    <meta property="profile:last_name" content={seo.familyName} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+    <meta name="twitter:image:alt" content={`${profile.name}, ${profile.role}`} />
+
+    <meta name="theme-color" content="#fafaf9" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0c0a09" media="(prefers-color-scheme: dark)" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Runs before paint: applies the saved theme and marks JS as available (no flash). -->
+    <script is:inline>
+      document.documentElement.classList.add('js');
+      try {
+        const t = localStorage.getItem('theme');
+        if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t;
+      } catch {}
+    </script>
+
+    <script type="application/ld+json" set:html={JSON.stringify(schema)} />
+  </head>
+  <body>
+    <a class="skip-link" href="#top">Skip to content</a>
+    <slot />
+  </body>
+</html>

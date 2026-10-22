@@ -1,0 +1,373 @@
+---
+import Base from '../layouts/Base.astro';
+import { profile, services, projects, process, about, terminal, stats, faq, experience, articles, moreWritingUrl, techStack } from '../data/profile';
+
+const mailto = `mailto:${profile.email}?subject=${encodeURIComponent('Project inquiry')}`;
+const primaryCta = profile.bookingUrl || mailto;
+const year = new Date().getFullYear();
+---
+
+<Base>
+  <div class="progress" aria-hidden="true"></div>
+
+  <header class="nav">
+    <div class="container nav-inner">
+      <a href="#top" class="logo">{profile.name}</a>
+      <nav>
+        <a href="#services">Services</a>
+        <a href="#work">Work</a>
+        <a href="#stack">Stack</a>
+        <a href="#experience">Experience</a>
+        <a href="#writing">Writing</a>
+        <a href="#faq">FAQ</a>
+        <button class="theme-toggle" type="button" aria-label="Toggle dark mode">
+          <svg class="icon-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg>
+          <svg class="icon-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"></path></svg>
+        </button>
+        <a href="#contact" class="btn btn-small">Hire me</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="top">
+    <section class="hero container">
+      <div class="hero-glow" aria-hidden="true"></div>
+      <div class="hero-text">
+        <p class="badge"><span class="dot"></span>{profile.availability}</p>
+        <h1>{profile.headline}</h1>
+        <p class="lead">{profile.subheadline}</p>
+        <div class="actions">
+          <a href={primaryCta} class="btn">
+            {profile.bookingUrl ? 'Book a free intro call' : 'Start a project'}
+          </a>
+          <a href="#work" class="btn btn-ghost">See my work</a>
+        </div>
+        <p class="meta">{profile.role} · {profile.location}</p>
+      </div>
+
+      <div class="terminal" aria-label="About me, terminal style">
+        <div class="terminal-bar"><span></span><span></span><span></span></div>
+        <div class="terminal-body">
+          {
+            terminal.map((line) => (
+              <div class="term-line">
+                <p class="term-cmd">
+                  <span class="prompt">$</span> <span class="typed" data-text={line.cmd}>{line.cmd}</span>
+                </p>
+                <p class="term-out">{line.out}</p>
+              </div>
+            ))
+          }
+          <p class="term-cmd"><span class="prompt">$</span> <span class="caret"></span></p>
+        </div>
+      </div>
+    </section>
+
+    <section class="container stats reveal" aria-label="At a glance">
+      {
+        stats.map((s) => (
+          <div class="stat">
+            <span class="stat-value">
+              <span class="count" data-target={s.value}>{s.value}</span>{s.suffix}
+            </span>
+            <span class="stat-label">{s.label}</span>
+          </div>
+        ))
+      }
+    </section>
+
+    <section id="services" class="container section">
+      <h2 class="reveal">What I can do for you</h2>
+      <div class="grid">
+        {
+          services.map((s) => (
+            <article class="card spotlight reveal">
+              <h3>{s.title}</h3>
+              <p>{s.body}</p>
+              <ul class="tags">
+                {s.tags.map((t) => (
+                  <li>{t}</li>
+                ))}
+              </ul>
+            </article>
+          ))
+        }
+      </div>
+    </section>
+
+    <section id="work" class="container section">
+      <h2 class="reveal">Selected work</h2>
+      <div class="projects">
+        {
+          projects.map((p) => (
+            <article class="card project spotlight reveal">
+              <h3>{p.title}</h3>
+              <dl>
+                <dt>Problem</dt>
+                <dd>{p.problem}</dd>
+                <dt>Solution</dt>
+                <dd>{p.solution}</dd>
+                <dt>Result</dt>
+                <dd class="result">{p.result}</dd>
+              </dl>
+              <ul class="tags">
+                {p.stack.map((t) => (
+                  <li>{t}</li>
+                ))}
+              </ul>
+            </article>
+          ))
+        }
+      </div>
+    </section>
+
+    <section id="process" class="container section">
+      <h2 class="reveal">How we'll work together</h2>
+      <ol class="steps">
+        {
+          process.map((s, i) => (
+            <li class="card spotlight reveal">
+              <span class="step-num">0{i + 1}</span>
+              <h3>{s.step}</h3>
+              <p>{s.body}</p>
+            </li>
+          ))
+        }
+      </ol>
+    </section>
+
+    <section id="stack" class="container section">
+      <h2 class="reveal">Tech stack</h2>
+      <p class="section-intro reveal">Everything I have used in production across 15+ years, grouped by area.</p>
+      <dl class="stack">
+        {
+          techStack.map((g) => (
+            <div class="stack-group reveal">
+              <dt>{g.group}</dt>
+              <dd>
+                <ul class="tags">
+                  {g.items.map((i) => (
+                    <li title={i.aliases?.join(', ')}>{i.name}</li>
+                  ))}
+                </ul>
+              </dd>
+            </div>
+          ))
+        }
+      </dl>
+    </section>
+
+    <section id="experience" class="container section">
+      <h2 class="reveal">Experience</h2>
+      <ol class="timeline">
+        {
+          experience.map((e) => (
+            <li class="reveal">
+              <span class="period">{e.period}</span>
+              <h3>
+                {e.role} · <span class="company">{e.company}</span>
+              </h3>
+              <p>{e.summary}</p>
+              {e.highlights && (
+                <ul class="highlights">
+                  {e.highlights.map((h) => (
+                    <li>{h}</li>
+                  ))}
+                </ul>
+              )}
+            </li>
+          ))
+        }
+      </ol>
+    </section>
+
+    <section id="writing" class="container section">
+      <h2 class="reveal">Writing</h2>
+      <p class="section-intro reveal">
+        Short, practical notes on .NET, architecture and security, mostly on LinkedIn, with longer pieces on Habr.
+      </p>
+      <div class="grid">
+        {
+          articles.map((a) => (
+            <a class="card spotlight reveal article" href={a.url} target="_blank" rel="noopener" lang={a.lang}>
+              <span class="article-meta">
+                {a.platform} · {a.date}
+                {a.byline && ` · as ${a.byline}`}
+              </span>
+              <h3>{a.title}</h3>
+              {a.titleEn !== a.title && <p class="article-en" lang="en">{a.titleEn}</p>}
+              <p lang="en">{a.summary}</p>
+              <ul class="tags">
+                {a.tags.map((t) => (
+                  <li>{t}</li>
+                ))}
+              </ul>
+            </a>
+          ))
+        }
+        <a class="card spotlight reveal article article-more" href={moreWritingUrl} target="_blank" rel="noopener">
+          <span class="article-meta">LinkedIn</span>
+          <h3>More posts on LinkedIn →</h3>
+          <p>Shorter notes and thoughts on backend engineering, published regularly.</p>
+        </a>
+      </div>
+    </section>
+
+    <section id="about" class="container section about reveal">
+      <h2>About me</h2>
+      {about.map((para) => <p>{para}</p>)}
+    </section>
+
+    <section id="faq" class="container section">
+      <h2 class="reveal">Frequently asked questions</h2>
+      <div class="faq">
+        {
+          faq.map((f) => (
+            <details class="card reveal">
+              <summary>{f.q}</summary>
+              <p>{f.a}</p>
+            </details>
+          ))
+        }
+      </div>
+    </section>
+
+    <section id="contact" class="container section contact reveal">
+      <h2>Have a project in mind?</h2>
+      <p class="lead">Tell me what you're building. I reply within one business day.</p>
+      <div class="actions">
+        <a href={mailto} class="btn">Email me</a>
+        <button type="button" class="btn btn-ghost copy-email" data-email={profile.email}>
+          Copy {profile.email}
+        </button>
+        {profile.bookingUrl && (
+          <a href={profile.bookingUrl} class="btn btn-ghost">
+            Book a call
+          </a>
+        )}
+        {profile.cvUrl && (
+          <a href={profile.cvUrl} class="btn btn-ghost">
+            Download CV
+          </a>
+        )}
+      </div>
+    </section>
+  </main>
+
+  <footer class="container footer">
+    <span>© {year} {profile.name}</span>
+    <span class="socials">
+      {
+        profile.socials.map((s) => (
+          <a href={s.url} rel="me noopener" target="_blank">
+            {s.label}
+          </a>
+        ))
+      }
+      <a href="/llms.txt" title="Plain-text profile for AI assistants">llms.txt</a>
+    </span>
+  </footer>
+
+  <div class="toast" role="status" aria-live="polite"></div>
+</Base>
+
+<script>
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const root = document.documentElement;
+
+  // Theme toggle: flips between light and dark, remembers the choice.
+  document.querySelector('.theme-toggle')?.addEventListener('click', () => {
+    const current =
+      root.dataset.theme ?? (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    const next = current === 'dark' ? 'light' : 'dark';
+    root.dataset.theme = next;
+    try {
+      localStorage.setItem('theme', next);
+    } catch {}
+  });
+
+  // Deep links (/#stack): web fonts load after the browser's initial jump and shift the layout, so re-align once they're ready.
+  if (location.hash) {
+    document.fonts.ready.then(() => document.querySelector(location.hash)?.scrollIntoView({ block: 'start' }));
+  }
+
+  // Scroll progress bar.
+  const progress = document.querySelector<HTMLElement>('.progress');
+  const updateProgress = () => {
+    const max = document.documentElement.scrollHeight - innerHeight;
+    progress?.style.setProperty('--p', String(max > 0 ? scrollY / max : 0));
+  };
+  addEventListener('scroll', updateProgress, { passive: true });
+  updateProgress();
+
+  // Count-up for stats.
+  const countUp = (el: HTMLElement) => {
+    const target = Number(el.dataset.target);
+    if (reduceMotion) return;
+    const start = performance.now();
+    const step = (now: number) => {
+      const t = Math.min((now - start) / 1200, 1);
+      el.textContent = String(Math.round(target * (1 - Math.pow(1 - t, 3))));
+      if (t < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  };
+
+  // Reveal-on-scroll; also triggers count-ups when the stats strip appears.
+  const observer = new IntersectionObserver(
+    (entries) => {
+      for (const entry of entries) {
+        if (!entry.isIntersecting) continue;
+        entry.target.classList.add('visible');
+        entry.target.querySelectorAll<HTMLElement>('.count').forEach(countUp);
+        observer.unobserve(entry.target);
+      }
+    },
+    { threshold: 0.15 },
+  );
+  document.querySelectorAll('.reveal').forEach((el) => observer.observe(el));
+
+  // Cursor-following spotlight on cards.
+  document.querySelectorAll<HTMLElement>('.spotlight').forEach((card) => {
+    card.addEventListener('pointermove', (e) => {
+      const r = card.getBoundingClientRect();
+      card.style.setProperty('--x', `${e.clientX - r.left}px`);
+      card.style.setProperty('--y', `${e.clientY - r.top}px`);
+    });
+  });
+
+  // Terminal typing animation. Text is already in the HTML, so no-JS and reduced-motion users see it all.
+  const typeTerminal = async () => {
+    const lines = document.querySelectorAll<HTMLElement>('.term-line');
+    const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+    lines.forEach((l) => l.classList.add('pending'));
+    for (const line of lines) {
+      const typed = line.querySelector<HTMLElement>('.typed')!;
+      const text = typed.dataset.text ?? '';
+      typed.textContent = '';
+      line.classList.replace('pending', 'typing');
+      for (const ch of text) {
+        typed.textContent += ch;
+        await sleep(45 + Math.random() * 40);
+      }
+      await sleep(250);
+      line.classList.replace('typing', 'done');
+      await sleep(400);
+    }
+  };
+  if (!reduceMotion) typeTerminal();
+
+  // Copy email with a toast.
+  const toast = document.querySelector<HTMLElement>('.toast');
+  document.querySelector<HTMLElement>('.copy-email')?.addEventListener('click', async (e) => {
+    const email = (e.currentTarget as HTMLElement).dataset.email ?? '';
+    try {
+      await navigator.clipboard.writeText(email);
+      if (toast) toast.textContent = 'Email copied to clipboard';
+    } catch {
+      if (toast) toast.textContent = email;
+    }
+    toast?.classList.add('show');
+    setTimeout(() => toast?.classList.remove('show'), 2200);
+  });
+</script>
