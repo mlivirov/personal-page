@@ -1,46 +1,54 @@
-// Generates the social preview image and PNG icons into /public.
-// Run with `npm run images` after changing your name, role or tagline.
+// Generates the social preview image and PNG icons into /public, matching the site's look.
+// Run with `npm run images` after changing the headline or the portfolio tiles.
 import sharp from 'sharp';
-
-const name = 'Max Livirov';
-const role = 'Freelance Senior .NET Engineer & Solution Architect';
-const tagline = 'High-load backends · Architecture · Kafka · Azure · AI / RAG';
-const facts = '15+ years  ·  FinTech  ·  Insurance  ·  Cybersecurity  ·  GovTech';
 
 const esc = (t) => t.replace(/&/g, '&amp;').replace(/</g, '&lt;');
 
-const font = "Inter, 'DejaVu Sans', sans-serif";
-const mono = "'JetBrains Mono', 'DejaVu Sans Mono', monospace";
+const font = "'PT Sans', 'Liberation Sans', Arial, 'DejaVu Sans', sans-serif";
+const headline = ['Designs and builds .NET backends', 'that keep working when', 'nobody is looking.'];
+const subline = 'Freelance senior .NET engineer & solution architect · 15+ years';
+const tiles = [
+  { bg: '#ebe6dc', fg: '#111', mark: 'GRC' },
+  { bg: '#d7263d', fg: '#fff', mark: '↻' },
+  { bg: '#111111', fg: '#fff', mark: '10×' },
+  { bg: '#ffd400', fg: '#111', mark: 'TB' },
+  { bg: '#1b4dff', fg: '#fff', mark: 'T−0' },
+];
 
+const tileW = 192;
+const tileH = 120;
+const tileGap = 20;
+const tilesSvg = tiles
+  .map((t, i) => {
+    const x = 80 + i * (tileW + tileGap);
+    return `<rect x="${x}" y="450" width="${tileW}" height="${tileH}" fill="${t.bg}"/>
+  <text x="${x + tileW / 2}" y="${450 + tileH / 2 + 14}" font-family="${font}" font-size="40" font-weight="700" fill="${t.fg}" text-anchor="middle">${esc(t.mark)}</text>`;
+  })
+  .join('\n  ');
+
+const lastLine = headline.length - 1;
 const og = `
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
-  <defs>
-    <radialGradient id="g1" cx="15%" cy="20%" r="60%">
-      <stop offset="0" stop-color="#2dd4bf" stop-opacity="0.35"/>
-      <stop offset="1" stop-color="#2dd4bf" stop-opacity="0"/>
-    </radialGradient>
-    <radialGradient id="g2" cx="90%" cy="85%" r="55%">
-      <stop offset="0" stop-color="#8b5cf6" stop-opacity="0.28"/>
-      <stop offset="1" stop-color="#8b5cf6" stop-opacity="0"/>
-    </radialGradient>
-  </defs>
-  <rect width="1200" height="630" fill="#0c0a09"/>
-  <rect width="1200" height="630" fill="url(#g1)"/>
-  <rect width="1200" height="630" fill="url(#g2)"/>
-  <rect x="80" y="86" width="360" height="44" rx="22" fill="#134e4a"/>
-  <circle cx="106" cy="108" r="7" fill="#2dd4bf"/>
-  <text x="124" y="116" font-family="${font}" font-size="22" font-weight="500" fill="#f5f5f4">Open to freelance projects</text>
-  <text x="80" y="250" font-family="${font}" font-size="96" font-weight="700" fill="#f5f5f4" letter-spacing="-2">${esc(name)}</text>
-  <text x="80" y="322" font-family="${font}" font-size="34" font-weight="600" fill="#2dd4bf">${esc(role)}</text>
-  <text x="80" y="400" font-family="${font}" font-size="30" fill="#d6d3d1">${esc(tagline)}</text>
-  <text x="80" y="450" font-family="${font}" font-size="26" fill="#a8a29e">${esc(facts)}</text>
-  <text x="80" y="560" font-family="${mono}" font-size="24" fill="#2dd4bf">$ <tspan fill="#a8a29e">hire --role architect --stack dotnet</tspan></text>
+  <rect width="1200" height="630" fill="#ffffff"/>
+  <text x="80" y="88" font-family="${font}" font-size="28" font-weight="700" fill="#000">max livirov</text>
+  <text x="1120" y="88" font-family="${font}" font-size="22" fill="#d7263d" text-anchor="end">Hire me</text>
+  ${headline
+    .map(
+      (line, i) =>
+        `<text x="80" y="${190 + i * 64}" font-family="${font}" font-size="56" fill="#000">${esc(line)}${
+          i === lastLine ? '<tspan font-size="28" dy="-24" fill="#d7263d">1</tspan>' : ''
+        }</text>`,
+    )
+    .join('\n  ')}
+  <text x="80" y="400" font-family="${font}" font-size="24" fill="#8a8a8a">${esc(subline)}</text>
+  ${tilesSvg}
 </svg>`;
 
 const icon = (size) => `
 <svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 64 64">
-  <rect width="64" height="64" rx="14" fill="#0d9488"/>
-  <text x="32" y="42" font-family="${font}" font-size="28" font-weight="700" fill="#fff" text-anchor="middle">ML</text>
+  <rect width="64" height="64" fill="#000"/>
+  <text x="32" y="43" font-family="${font}" font-size="30" font-weight="700" fill="#fff" text-anchor="middle">ml</text>
+  <rect x="48" y="10" width="6" height="6" fill="#d7263d"/>
 </svg>`;
 
 const render = (svg, out) => sharp(Buffer.from(svg)).png().toFile(out);

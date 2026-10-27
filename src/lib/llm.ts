@@ -13,6 +13,7 @@ import {
   stats,
   industries,
   engagement,
+  focus,
   techStack,
 } from '../data/profile';
 import { basePhrases } from './keywords';
@@ -64,6 +65,9 @@ export function llmsTxt(site: string): string {
     `- Location: ${profile.location}`,
     ...stats.map((s) => `- ${s.value}${s.suffix} ${s.label}`),
     `- Core skills: ${skills()}`,
+    `- Main focus: ${focus.primary}`,
+    `- Also uses: ${focus.secondary}`,
+    `- Earlier experience: ${focus.past}`,
     ...(profile.alternateName ? [`- Also published as: ${profile.alternateName}`] : []),
     '',
     '## Tech stack',
@@ -128,6 +132,9 @@ export function llmsFullTxt(site: string): string {
     `- Location: ${profile.location}`,
     ...(profile.alternateName ? [`- Also published as: ${profile.alternateName}`] : []),
     `- Core skills: ${skills()}`,
+    `- Main focus: ${focus.primary}`,
+    `- Also uses: ${focus.secondary}`,
+    `- Earlier experience: ${focus.past}`,
     '',
     '## Tech stack',
     '',
@@ -152,6 +159,7 @@ export function llmsFullTxt(site: string): string {
     ...projects.flatMap((p) => [
       `### ${p.title}`,
       '',
+      `- Client: ${p.client} (${p.year})`,
       `- Problem: ${p.problem}`,
       `- Solution: ${p.solution}`,
       `- Result: ${p.result}`,

@@ -1,155 +1,142 @@
 ---
 import Base from '../layouts/Base.astro';
-import { profile, services, projects, process, about, terminal, stats, faq, experience, articles, moreWritingUrl, techStack } from '../data/profile';
+import { profile, services, projects, experience, faq, techStack } from '../data/profile';
 
-const mailto = `mailto:${profile.email}?subject=${encodeURIComponent('Project inquiry')}`;
-const primaryCta = profile.bookingUrl || mailto;
 const year = new Date().getFullYear();
+const mailto = `mailto:${profile.email}`;
+
+// House typography: glue short words to the next one and keep dashes off line starts,
+// so no line ever ends on "a", "to" or "of".
+const typo = (t: string) =>
+  t
+    .replace(/(^|\s)([A-Za-z]{1,3}|[0-9]+[×+]?)\s/g, '$1$2 ')
+    .replace(/\s—/g, ' —')
+    .replace(/(\d)\s?–\s?(\d|Present)/g, '$1–$2');
+
+const slug = (t: string) => t.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+
+// Portfolio "thumbnails": flat colour posters with a typographic mark and a joke in the tooltip.
+const tiles = [
+  { bg: '#ebe6dc', fg: '#111', mark: 'GRC', small: 'FedRAMP · NIST', joke: 'Compliance, but make it fast' },
+  { bg: '#d7263d', fg: '#fff', mark: '↻', small: 'monthly · annually', joke: 'Every month, on schedule. Even in February.' },
+  { bg: '#111', fg: '#fff', mark: '10×', small: 'response time', joke: 'Same servers. Different attitude.' },
+  { bg: '#ffd400', fg: '#111', mark: 'TB', small: 'hundreds of them', joke: 'Rows were counted. It took a while.' },
+  { bg: '#1b4dff', fg: '#fff', mark: 'T−0', small: 'Antares · RTOS', joke: 'Literally rocket science' },
+];
+
+const cases = projects.map((p, i) => ({ ...p, id: slug(p.title), tile: tiles[i % tiles.length], n: i + 1 }));
 ---
 
 <Base>
-  <div class="progress" aria-hidden="true"></div>
-
-  <header class="nav">
-    <div class="container nav-inner">
-      <a href="#top" class="logo">{profile.name}</a>
+  <div class="page">
+    <header>
+      <a href="#top" class="logo" title="That’s me">max livirov</a>
       <nav>
+        <a href="#portfolio">Portfolio</a>
         <a href="#services">Services</a>
-        <a href="#work">Work</a>
         <a href="#stack">Stack</a>
         <a href="#experience">Experience</a>
-        <a href="#writing">Writing</a>
-        <a href="#faq">FAQ</a>
-        <button class="theme-toggle" type="button" aria-label="Toggle dark mode">
-          <svg class="icon-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg>
-          <svg class="icon-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"></path></svg>
-        </button>
-        <a href="#contact" class="btn btn-small">Hire me</a>
+        <a href="#questions">Questions</a>
       </nav>
-    </div>
-  </header>
+      <a class="order" href={mailto} title="Opens your mail client. Nothing scary.">Hire me</a>
+    </header>
 
-  <main id="top">
-    <section class="hero container">
-      <div class="hero-glow" aria-hidden="true"></div>
-      <div class="hero-text">
-        <p class="badge"><span class="dot"></span>{profile.availability}</p>
-        <h1>{profile.headline}</h1>
-        <p class="lead">{profile.subheadline}</p>
-        <div class="actions">
-          <a href={primaryCta} class="btn">
-            {profile.bookingUrl ? 'Book a free intro call' : 'Start a project'}
-          </a>
-          <a href="#work" class="btn btn-ghost">See my work</a>
-        </div>
-        <p class="meta">{profile.role} · {profile.location}</p>
-      </div>
-
-      <div class="terminal" aria-label="About me, terminal style">
-        <div class="terminal-bar"><span></span><span></span><span></span></div>
-        <div class="terminal-body">
-          {
-            terminal.map((line) => (
-              <div class="term-line">
-                <p class="term-cmd">
-                  <span class="prompt">$</span> <span class="typed" data-text={line.cmd}>{line.cmd}</span>
-                </p>
-                <p class="term-out">{line.out}</p>
-              </div>
-            ))
-          }
-          <p class="term-cmd"><span class="prompt">$</span> <span class="caret"></span></p>
-        </div>
-      </div>
+    <main id="top">
+    <section class="hero">
+      <h1 set:html={typo('Max Livirov designs and builds .NET backends that keep working when nobody is looking.<sup>1</sup>')} />
+      <p class="aside">
+        Freelance. Remote. Fifteen years in FinTech, insurance, security and GovTech.
+      </p>
+      <p class="footnote"><sup>1</sup> Including weekends, holidays and the night before a release.</p>
     </section>
 
-    <section class="container stats reveal" aria-label="At a glance">
+    <section id="portfolio">
+      <h2 class="label">Portfolio <span class="grey">{cases.length} projects</span></h2>
+        <div class="portfolio">
+          {
+            cases.map((c) => (
+              <a class="item" href={`#${c.id}`} title={c.tile.joke}>
+                <div class="thumb" style={`background:${c.tile.bg};color:${c.tile.fg}`}>
+                  <span class="mark">{c.tile.mark}</span>
+                  <span class="mini">{c.tile.small}</span>
+                </div>
+                <h3 set:html={typo(c.title)} />
+                <p class="grey">
+                  {c.client}, <span class="nowrap">{c.year}</span>
+                </p>
+              </a>
+            ))
+          }
+        </div>
+    </section>
+
+    <section class="cases">
       {
-        stats.map((s) => (
-          <div class="stat">
-            <span class="stat-value">
-              <span class="count" data-target={s.value}>{s.value}</span>{s.suffix}
-            </span>
-            <span class="stat-label">{s.label}</span>
-          </div>
+        cases.map((c, i) => (
+          <article id={c.id} class="case" data-case>
+            <div class="case-thumb" style={`background:${c.tile.bg};color:${c.tile.fg}`}>
+              {c.tile.mark}
+            </div>
+            <div class="case-body">
+              <p class="grey small">
+                Project {c.n} of {cases.length} · {c.client}, {c.year}
+              </p>
+              <h2 set:html={typo(c.title)} />
+              <dl>
+                <dt>Task</dt>
+                <dd set:html={typo(c.problem)} />
+                <dt>Solution</dt>
+                <dd set:html={typo(c.solution)} />
+                <dt>Result</dt>
+                <dd class="result" set:html={typo(c.result)} />
+                <dt>Stack</dt>
+                <dd class="grey">{c.stack.join(', ')}</dd>
+              </dl>
+              <p class="pager">
+                {i > 0 ? <a href={`#${cases[i - 1].id}`}>← previous</a> : <span class="grey">← previous</span>}
+                <kbd>Ctrl</kbd>
+                {i < cases.length - 1 ? <a href={`#${cases[i + 1].id}`}>next →</a> : <span class="grey">next →</span>}
+              </p>
+            </div>
+          </article>
         ))
       }
     </section>
 
-    <section id="services" class="container section">
-      <h2 class="reveal">What I can do for you</h2>
-      <div class="grid">
+    <section id="services">
+      <h2 class="label">What I can do for you</h2>
+      <div class="offers">
         {
-          services.map((s) => (
-            <article class="card spotlight reveal">
-              <h3>{s.title}</h3>
-              <p>{s.body}</p>
-              <ul class="tags">
-                {s.tags.map((t) => (
-                  <li>{t}</li>
-                ))}
-              </ul>
-            </article>
+          services.map((s, i) => (
+            <div class="offer">
+              <span class="sect">§&nbsp;{i + 1}</span>
+              <h3>
+                <a href={mailto} title="Yes, this one">
+                  {s.title}
+                </a>
+              </h3>
+              <p set:html={typo(s.body)} />
+              <p class="grey small">{s.tags.join(', ')}</p>
+            </div>
           ))
         }
       </div>
     </section>
 
-    <section id="work" class="container section">
-      <h2 class="reveal">Selected work</h2>
-      <div class="projects">
-        {
-          projects.map((p) => (
-            <article class="card project spotlight reveal">
-              <h3>{p.title}</h3>
-              <dl>
-                <dt>Problem</dt>
-                <dd>{p.problem}</dd>
-                <dt>Solution</dt>
-                <dd>{p.solution}</dd>
-                <dt>Result</dt>
-                <dd class="result">{p.result}</dd>
-              </dl>
-              <ul class="tags">
-                {p.stack.map((t) => (
-                  <li>{t}</li>
-                ))}
-              </ul>
-            </article>
-          ))
-        }
-      </div>
-    </section>
-
-    <section id="process" class="container section">
-      <h2 class="reveal">How we'll work together</h2>
-      <ol class="steps">
-        {
-          process.map((s, i) => (
-            <li class="card spotlight reveal">
-              <span class="step-num">0{i + 1}</span>
-              <h3>{s.step}</h3>
-              <p>{s.body}</p>
-            </li>
-          ))
-        }
-      </ol>
-    </section>
-
-    <section id="stack" class="container section">
-      <h2 class="reveal">Tech stack</h2>
-      <p class="section-intro reveal">Everything I have used in production across 15+ years, grouped by area.</p>
+    <section id="stack">
+      <h2 class="label">Tech stack</h2>
       <dl class="stack">
         {
           techStack.map((g) => (
-            <div class="stack-group reveal">
+            <div class="stack-row">
               <dt>{g.group}</dt>
               <dd>
-                <ul class="tags">
-                  {g.items.map((i) => (
-                    <li title={i.aliases?.join(', ')}>{i.name}</li>
-                  ))}
-                </ul>
+                {g.items.map((t, i) => (
+                  <>
+                    <span title={t.aliases?.length ? `Also known as ${t.aliases.join(', ')}` : undefined}>{t.name}</span>
+                    {i < g.items.length - 1 && ', '}
+                  </>
+                ))}
               </dd>
             </div>
           ))
@@ -157,217 +144,76 @@ const year = new Date().getFullYear();
       </dl>
     </section>
 
-    <section id="experience" class="container section">
-      <h2 class="reveal">Experience</h2>
-      <ol class="timeline">
+    <section id="experience" class="two-col">
+      <h2 class="label">Experience</h2>
+      <table>
         {
           experience.map((e) => (
-            <li class="reveal">
-              <span class="period">{e.period}</span>
-              <h3>
-                {e.role} · <span class="company">{e.company}</span>
-              </h3>
-              <p>{e.summary}</p>
-              {e.highlights && (
-                <ul class="highlights">
-                  {e.highlights.map((h) => (
-                    <li>{h}</li>
-                  ))}
-                </ul>
-              )}
-            </li>
+            <tr>
+              <td class="grey nowrap num">{e.period.replace(' – ', '–')}</td>
+              <td>
+                <b>{e.company}</b>
+                <br />
+                <span class="grey">
+                  {e.role}, {e.type.toLowerCase()}
+                </span>
+              </td>
+            </tr>
           ))
         }
-      </ol>
+      </table>
     </section>
 
-    <section id="writing" class="container section">
-      <h2 class="reveal">Writing</h2>
-      <p class="section-intro reveal">
-        Short, practical notes on .NET, architecture and security, mostly on LinkedIn, with longer pieces on Habr.
-      </p>
-      <div class="grid">
-        {
-          articles.map((a) => (
-            <a class="card spotlight reveal article" href={a.url} target="_blank" rel="noopener" lang={a.lang}>
-              <span class="article-meta">
-                {a.platform} · {a.date}
-                {a.byline && ` · as ${a.byline}`}
-              </span>
-              <h3>{a.title}</h3>
-              {a.titleEn !== a.title && <p class="article-en" lang="en">{a.titleEn}</p>}
-              <p lang="en">{a.summary}</p>
-              <ul class="tags">
-                {a.tags.map((t) => (
-                  <li>{t}</li>
-                ))}
-              </ul>
-            </a>
-          ))
-        }
-        <a class="card spotlight reveal article article-more" href={moreWritingUrl} target="_blank" rel="noopener">
-          <span class="article-meta">LinkedIn</span>
-          <h3>More posts on LinkedIn →</h3>
-          <p>Shorter notes and thoughts on backend engineering, published regularly.</p>
-        </a>
-      </div>
-    </section>
-
-    <section id="about" class="container section about reveal">
-      <h2>About me</h2>
-      {about.map((para) => <p>{para}</p>)}
-    </section>
-
-    <section id="faq" class="container section">
-      <h2 class="reveal">Frequently asked questions</h2>
-      <div class="faq">
+    <section id="questions" class="two-col">
+      <h2 class="label">Questions</h2>
+      <dl class="faq">
         {
           faq.map((f) => (
-            <details class="card reveal">
-              <summary>{f.q}</summary>
-              <p>{f.a}</p>
-            </details>
+            <>
+              <dt set:html={typo(f.q)} />
+              <dd set:html={typo(f.a)} />
+            </>
           ))
         }
-      </div>
+      </dl>
     </section>
 
-    <section id="contact" class="container section contact reveal">
-      <h2>Have a project in mind?</h2>
-      <p class="lead">Tell me what you're building. I reply within one business day.</p>
-      <div class="actions">
-        <a href={mailto} class="btn">Email me</a>
-        <button type="button" class="btn btn-ghost copy-email" data-email={profile.email}>
-          Copy {profile.email}
-        </button>
-        {profile.bookingUrl && (
-          <a href={profile.bookingUrl} class="btn btn-ghost">
-            Book a call
-          </a>
-        )}
-        {profile.cvUrl && (
-          <a href={profile.cvUrl} class="btn btn-ghost">
-            Download CV
-          </a>
-        )}
-      </div>
+    <section class="cta">
+      <p>
+        Email me: <a href={mailto}>{profile.email}</a>
+      </p>
+      <p class="grey">Replies within one business day. Signs your NDA before the first call.</p>
     </section>
-  </main>
 
-  <footer class="container footer">
-    <span>© {year} {profile.name}</span>
-    <span class="socials">
-      {
-        profile.socials.map((s) => (
-          <a href={s.url} rel="me noopener" target="_blank">
-            {s.label}
-          </a>
-        ))
-      }
-      <a href="/llms.txt" title="Plain-text profile for AI assistants">llms.txt</a>
-    </span>
-  </footer>
+    </main>
 
-  <div class="toast" role="status" aria-live="polite"></div>
+    <footer>
+      <span>© 2009–{year} Max Livirov</span>
+      <span class="hint grey">
+        <kbd>Ctrl</kbd> + <kbd>←</kbd> <kbd>→</kbd> to flip through projects
+      </span>
+      <span class="links">
+        {profile.socials.map((s) => <a href={s.url}>{s.label}</a>)}
+      </span>
+    </footer>
+  </div>
 </Base>
 
 <script>
-  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const root = document.documentElement;
-
-  // Theme toggle: flips between light and dark, remembers the choice.
-  document.querySelector('.theme-toggle')?.addEventListener('click', () => {
-    const current =
-      root.dataset.theme ?? (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-    const next = current === 'dark' ? 'light' : 'dark';
-    root.dataset.theme = next;
-    try {
-      localStorage.setItem('theme', next);
-    } catch {}
-  });
-
   // Deep links (/#stack): web fonts load after the browser's initial jump and shift the layout, so re-align once they're ready.
   if (location.hash) {
     document.fonts.ready.then(() => document.querySelector(location.hash)?.scrollIntoView({ block: 'start' }));
   }
 
-  // Scroll progress bar.
-  const progress = document.querySelector<HTMLElement>('.progress');
-  const updateProgress = () => {
-    const max = document.documentElement.scrollHeight - innerHeight;
-    progress?.style.setProperty('--p', String(max > 0 ? scrollY / max : 0));
-  };
-  addEventListener('scroll', updateProgress, { passive: true });
-  updateProgress();
-
-  // Count-up for stats.
-  const countUp = (el: HTMLElement) => {
-    const target = Number(el.dataset.target);
-    if (reduceMotion) return;
-    const start = performance.now();
-    const step = (now: number) => {
-      const t = Math.min((now - start) / 1200, 1);
-      el.textContent = String(Math.round(target * (1 - Math.pow(1 - t, 3))));
-      if (t < 1) requestAnimationFrame(step);
-    };
-    requestAnimationFrame(step);
-  };
-
-  // Reveal-on-scroll; also triggers count-ups when the stats strip appears.
-  const observer = new IntersectionObserver(
-    (entries) => {
-      for (const entry of entries) {
-        if (!entry.isIntersecting) continue;
-        entry.target.classList.add('visible');
-        entry.target.querySelectorAll<HTMLElement>('.count').forEach(countUp);
-        observer.unobserve(entry.target);
-      }
-    },
-    { threshold: 0.15 },
-  );
-  document.querySelectorAll('.reveal').forEach((el) => observer.observe(el));
-
-  // Cursor-following spotlight on cards.
-  document.querySelectorAll<HTMLElement>('.spotlight').forEach((card) => {
-    card.addEventListener('pointermove', (e) => {
-      const r = card.getBoundingClientRect();
-      card.style.setProperty('--x', `${e.clientX - r.left}px`);
-      card.style.setProperty('--y', `${e.clientY - r.top}px`);
-    });
-  });
-
-  // Terminal typing animation. Text is already in the HTML, so no-JS and reduced-motion users see it all.
-  const typeTerminal = async () => {
-    const lines = document.querySelectorAll<HTMLElement>('.term-line');
-    const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
-    lines.forEach((l) => l.classList.add('pending'));
-    for (const line of lines) {
-      const typed = line.querySelector<HTMLElement>('.typed')!;
-      const text = typed.dataset.text ?? '';
-      typed.textContent = '';
-      line.classList.replace('pending', 'typing');
-      for (const ch of text) {
-        typed.textContent += ch;
-        await sleep(45 + Math.random() * 40);
-      }
-      await sleep(250);
-      line.classList.replace('typing', 'done');
-      await sleep(400);
-    }
-  };
-  if (!reduceMotion) typeTerminal();
-
-  // Copy email with a toast.
-  const toast = document.querySelector<HTMLElement>('.toast');
-  document.querySelector<HTMLElement>('.copy-email')?.addEventListener('click', async (e) => {
-    const email = (e.currentTarget as HTMLElement).dataset.email ?? '';
-    try {
-      await navigator.clipboard.writeText(email);
-      if (toast) toast.textContent = 'Email copied to clipboard';
-    } catch {
-      if (toast) toast.textContent = email;
-    }
-    toast?.classList.add('show');
-    setTimeout(() => toast?.classList.remove('show'), 2200);
+  // Ctrl + ←/→ flips between projects, like the portfolio pages this design borrows from.
+  const cases = [...document.querySelectorAll<HTMLElement>('[data-case]')];
+  // Index of the case scrolled to (its top has reached the top of the screen), or -1 above the first one.
+  const current = () => cases.findLastIndex((c) => c.getBoundingClientRect().top <= 40);
+  addEventListener('keydown', (e) => {
+    if (!e.ctrlKey || !['ArrowLeft', 'ArrowRight'].includes(e.key)) return;
+    if ((e.target as HTMLElement).closest('input, textarea')) return;
+    e.preventDefault();
+    const i = current() + (e.key === 'ArrowRight' ? 1 : -1);
+    cases[Math.max(0, Math.min(cases.length - 1, i))].scrollIntoView({ behavior: 'smooth', block: 'start' });
   });
 </script>

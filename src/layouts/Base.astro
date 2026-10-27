@@ -166,24 +166,15 @@ const schema = {
     <meta name="twitter:image" content={ogImage} />
     <meta name="twitter:image:alt" content={`${profile.name}, ${profile.role}`} />
 
-    <meta name="theme-color" content="#fafaf9" media="(prefers-color-scheme: light)" />
-    <meta name="theme-color" content="#0c0a09" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#ffffff" />
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap"
+      href="https://fonts.googleapis.com/css2?family=PT+Sans:ital,wght@0,400;0,700;1,400&family=PT+Serif:ital@0;1&display=swap"
       rel="stylesheet"
     />
 
-    <!-- Runs before paint: applies the saved theme and marks JS as available (no flash). -->
-    <script is:inline>
-      document.documentElement.classList.add('js');
-      try {
-        const t = localStorage.getItem('theme');
-        if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t;
-      } catch {}
-    </script>
 
     <script type="application/ld+json" set:html={JSON.stringify(schema)} />
   </head>

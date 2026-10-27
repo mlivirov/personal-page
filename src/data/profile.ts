@@ -22,6 +22,13 @@ export const profile = {
   ],
 };
 
+// What you do now vs. what you've done. llms.txt states this so assistants don't pitch the wrong kind of work.
+export const focus = {
+  primary: 'C# / .NET backend engineering and solution architecture',
+  secondary: 'Python for scripting and prototyping (e.g. automation, proofs of concept, a FastAPI BFF); Angular on the frontend when needed',
+  past: 'C++ (2009–2014: real-time, embedded and systems work). Can still read and review C++ code, but does not take C++ development projects.',
+};
+
 // Search-engine specifics. Keep `title` under ~60 chars and `description` under ~155 so Google doesn't truncate them.
 export const seo = {
   title: 'Max Livirov — Freelance Senior .NET Engineer & Architect',
@@ -61,8 +68,7 @@ export const techStack: { group: string; items: { name: string; aliases?: string
     group: 'Languages',
     items: [
       { name: 'C#', aliases: ['CSharp', 'C Sharp', 'C# developer', 'C# engineer'] },
-      { name: 'C++', aliases: ['C++14', 'CPP', 'Modern C++'] },
-      { name: 'Python', aliases: ['Python 3'] },
+      { name: 'Python (scripting & prototyping)', aliases: ['Python 3', 'automation scripts', 'prototyping', 'FastAPI BFF'] },
       { name: 'TypeScript', aliases: ['TS'] },
       { name: 'JavaScript', aliases: ['JS'] },
       { name: 'Scala' },
@@ -226,16 +232,6 @@ export const techStack: { group: string; items: { name: string; aliases?: string
     ],
   },
   {
-    group: 'Systems & embedded',
-    items: [
-      { name: 'Boost', aliases: ['Boost C++'] },
-      { name: 'Qt', aliases: ['Qt framework'] },
-      { name: 'RTOS', aliases: ['real-time operating system', 'embedded'] },
-      { name: 'Multithreading', aliases: ['concurrency', 'synchronization'] },
-      { name: 'Networking', aliases: ['TCP/IP', 'proprietary protocols', 'PC over IP', 'FTP'] },
-    ],
-  },
-  {
     group: 'Domains',
     items: [
       { name: 'FinTech', aliases: ['financial technology', 'financial services'] },
@@ -249,6 +245,18 @@ export const techStack: { group: string; items: { name: string; aliases?: string
       { name: 'E-commerce', aliases: ['marketplace', 'retail', 'grocery delivery'] },
       { name: 'CRM', aliases: ['CRM systems', 'workflow engine', 'business rules engine'] },
       { name: 'Aerospace', aliases: ['space tech', 'launch monitoring'] },
+    ],
+  },
+  {
+    // Earlier career (2009–2014). Shown for context; not offered as current work.
+    group: 'Earlier career: C++',
+    items: [
+      { name: 'C++', aliases: ['C++14'] },
+      { name: 'Boost' },
+      { name: 'Qt' },
+      { name: 'RTOS', aliases: ['real-time operating system'] },
+      { name: 'Multithreading' },
+      { name: 'Networking protocols', aliases: ['TCP/IP', 'PC over IP'] },
     ],
   },
 ];
@@ -320,6 +328,8 @@ export const services = [
 export const projects = [
   {
     title: 'Re-architecting a federal GRC SaaS platform',
+    client: 'Kanda Software',
+    year: '2025–2026',
     problem:
       'A Governance, Risk & Compliance platform that helps US government agencies get Authority to Operate (FedRAMP, FISMA, NIST) had outgrown its legacy backend.',
     solution:
@@ -329,6 +339,8 @@ export const projects = [
   },
   {
     title: 'Recurring payments service for a delivery platform',
+    client: 'Snoonu',
+    year: '2025',
     problem: "Snoonu's platform needed subscriptions and instalment payments managed end to end, with reliable messaging to downstream systems.",
     solution:
       'Built a .NET 8 billing-agreement microservice with a full lifecycle (Pending → Scheduled → Active → Completed/Cancelled), MediatR use cases, Hangfire scheduling and MassTransit/RabbitMQ consumers.',
@@ -337,6 +349,8 @@ export const projects = [
   },
   {
     title: 'Speeding up a Privileged Access Management product',
+    client: 'Indeed Company',
+    year: '2024–2025',
     problem: 'An IT-security (PAM) product needed new authentication options and faster responses to win and keep enterprise customers.',
     solution: 'Implemented multiple external authentication providers, optimised hot code paths and set up compliant GitLab build pipelines.',
     result: 'Server response time up to 10× faster; new auth options widened the sales funnel and helped expand the client contract.',
@@ -344,6 +358,8 @@ export const projects = [
   },
   {
     title: 'Corporate data warehouse at hundreds of terabytes',
+    client: 'Petrovich-Tech',
+    year: '2022–2023',
     problem: 'Developers and sales teams at a large retailer could not easily get to the data they needed to spot trends.',
     solution: 'Designed the warehouse from scratch on Kafka, Spark, ClickHouse and Airflow, plus a high-load Data Fabric API and Angular management console.',
     result: 'Self-service data access for engineering and sales, and faster replies to customer requests.',
@@ -351,6 +367,8 @@ export const projects = [
   },
   {
     title: 'Launch-monitoring software for the Antares rocket',
+    client: 'Design Office “Yuzhnoye”',
+    year: '2009–2013',
     problem: 'Space-tech monitoring software for launches (contracted with Orbital ATK) was slow to develop on a real-time OS.',
     solution: 'Played a lead role on the software and ported the Qt library to the company\'s real-time operating system.',
     result: 'Development cycle cut from several months to just weeks.',
@@ -515,13 +533,6 @@ export const articles: {
 
 // Where the rest of your short posts live.
 export const moreWritingUrl = 'https://www.linkedin.com/in/max-livirov/recent-activity/all/';
-
-// Animated terminal in the hero. `cmd` is typed out, `out` appears after it.
-export const terminal = [
-  { cmd: 'whoami', out: 'max — senior .NET engineer & solution architect' },
-  { cmd: 'cat stack.txt', out: 'c# · .net · kafka · postgres · azure · angular · rag' },
-  { cmd: './availability --check', out: '✓ open for new freelance projects' },
-];
 
 export const stats = [
   { value: 15, suffix: '+', label: 'years building backend systems' },
